@@ -1,6 +1,8 @@
-Idea by /u/robtheimpure: https://reddit.com/5mledp
+![Panic Button](https://i.imgur.com/Q43KgN3.png)
 
-Panic Button
+Idea by [/u/robtheimpure](https://www.reddit.com/user/robtheimpure): https://reddit.com/5mledp
+
+###Panic Button
     - Active item, single use
     - On activation, the game moves at SPEED! challenge pace for the next 10
         rooms.
@@ -18,7 +20,7 @@ TODO:
     - "animate" the required room count as it approaches zero
     - add weights to more valuable pickups
     - tweak spawn numbers
-    ? speed up player (like post-nerf SPEED! challenge)?
-    ? spawn items from specific item pools based on floor (like Pandora's Box)?
-    ? switch to costume instead RenderText above the player's head?
+    - speed up player (like post-nerf SPEED! challenge)?
+    - spawn items from specific item pools based on floor (like Pandora's Box)?
+    - switch to costume instead RenderText above the player's head?
 
