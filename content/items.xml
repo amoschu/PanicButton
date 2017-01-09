@@ -1,0 +1,12 @@
+<items gfxroot="gfx/items/" version="1">
+    <active description="Everyone panic!" gfx="panicbutton.png" maxcharges="1" name="Panic Button" />
+
+    <!--
+     This is a passive item used to ensure an EVALUATE_CACHE event is triggered.
+     It is only needed to adjust the player's speed on Panic Button use.
+    -->
+    <!-- commented out because I'm not sure if the player's speed should be altered
+    <passive name="__panic_button_passive__" cache="speed" />
+    -->
+
+</items>
