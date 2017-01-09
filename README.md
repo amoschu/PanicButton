@@ -13,7 +13,14 @@ Idea by [/u/robtheimpure](https://www.reddit.com/user/robtheimpure): https://red
         spawns an item and several pickups.
 * Spawns 2 items if completed on a post-Mom floor.
 
-###TODO:
+###How to get the item
+1. [Open the console](https://zatherz.eu/isaac/afterbirth+docs/md__i_1_doxygen_test_input_converted_test__debug__console__primer.html)
+2. Type `giveitem Panic Button` and hit enter
+
+Unfortunately, the API currently has no feasible way to add items to item pools
+so there isn't a way to get the item through gameplay for now.
+
+####TODO:
 * add to item pools (API doesn't facilitate this yet)
 * speed up music if active (is this possible?)
 * "animate" the required room count as it approaches zero
