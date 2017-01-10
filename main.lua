@@ -102,6 +102,7 @@ function mod:RemoveRemaining()
     self._rooms_remaining = nil
     self._room_seed = nil
     self._num_room_enemies = nil
+    self._cleared_rooms = nil
     self:RemoveData()
 end
 
