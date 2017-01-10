@@ -30,5 +30,5 @@ so there isn't a way to get the item through gameplay for now.
 * tweak spawn numbers
 * ? speed up player (like post-nerf SPEED! challenge)?
 * ? spawn items from specific item pools based on floor (like Pandora's Box)?
-* ? switch to costume instead RenderText above the player's head?
+* ? switch to costume instead of RenderText above the player's head?
 
