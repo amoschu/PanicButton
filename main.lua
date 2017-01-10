@@ -198,6 +198,7 @@ function mod:SpawnReward()
     -- XXX: this does not respect the run's seed
     --  ie, the rewards spawned in two runs with the same seed will be different
     --  (I don't think the API allows for this functionality yet)
+    math.randomseed(Game:GetRoom():GetSpawnSeed())
     for pickup_type, max in pairs(MAX_REWARD) do
         local num_to_spawn = math.random(0, max)
         local max_subtype = 0
