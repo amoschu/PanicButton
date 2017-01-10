@@ -475,7 +475,10 @@ function mod:OnRender()
 end
 
 mod:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, mod.OnInit)
-mod:AddCallback(ModCallbacks.MC_USE_ITEM, mod.OnPanicButtonUse)
+local collectible_panicbutton = Isaac.GetItemIdByName("Panic Button")
+mod:AddCallback(
+    ModCallbacks.MC_USE_ITEM, mod.OnPanicButtonUse, collectible_panicbutton
+)
 -- XXX: should the player's speed be increased?
 -- mod:AddCallback(ModCallbacks.MC_EVALUATE_CACHE, mod.OnEvalCache)
 
