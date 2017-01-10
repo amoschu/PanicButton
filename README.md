@@ -21,12 +21,14 @@ Unfortunately, the API currently has no feasible way to add items to item pools
 so there isn't a way to get the item through gameplay for now.
 
 ####TODO:
+* implement boss rush & greed mode waves
+* stop drawing the countdown during cutscenes
 * add to item pools (API doesn't facilitate this yet)
 * speed up music if active (is this possible?)
 * "animate" the required room count as it approaches zero
-* add weights to more valuable pickups
+* add weights to pickup spawns (rarer pickups should be, well, rarer)
 * tweak spawn numbers
-* speed up player (like post-nerf SPEED! challenge)?
-* spawn items from specific item pools based on floor (like Pandora's Box)?
-* switch to costume instead RenderText above the player's head?
+* ? speed up player (like post-nerf SPEED! challenge)?
+* ? spawn items from specific item pools based on floor (like Pandora's Box)?
+* ? switch to costume instead RenderText above the player's head?
 
