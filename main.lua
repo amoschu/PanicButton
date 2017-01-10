@@ -30,6 +30,9 @@ local MAX_REWARD = {
 -- ---------------------------------------------------------------------
 -- ---------------------------------------------------------------------
 
+-- turn on/off some debug functionality
+local _DEBUG = false
+
 local mod = RegisterMod("PanicButton", 1)
 local Game = Game
 if type(Game) == "function" then
@@ -37,8 +40,10 @@ if type(Game) == "function" then
 end
 
 local function Log(caller, fmt, ...)
-    fmt = ("[%s:%s] %s"):format(mod.Name, caller, fmt)
-    Isaac.DebugString(fmt:format(...))
+    if _DEBUG then
+        fmt = ("[%s:%s] %s"):format(mod.Name, caller, fmt)
+        Isaac.DebugString(fmt:format(...))
+    end
 end
 
 -- ---------------------------------------------------------------------
@@ -282,6 +287,8 @@ function mod:OnInit(player)
             local room = Game:GetRoom()
             room_seed = tonumber(room_seed)
             if room:GetSpawnSeed() ~= room_seed then
+                -- XXX: this breaks if the player resets a seeded run from
+                --  the starting room
                 Log("Initialize", "new game detected")
                 self:RemoveRemaining()
             else
@@ -376,7 +383,9 @@ function mod:OnUpdate()
 
         if room_seed ~= self._room_seed then
             -- room changed
-            Log("OnUpdate", "room changed")
+            Log("OnUpdate", "room changed (%d -> %d)",
+                self._room_seed, room_seed
+            )
             self._room_seed = room_seed
             self._num_room_enemies = room:GetAliveEnemiesCount()
             self:SpeedUp()
@@ -430,27 +439,29 @@ function mod:OnUpdate()
 end
 
 function mod:OnRender()
-    local level = Game:GetLevel()
-    local room = Game:GetRoom()
-    Isaac.RenderText(
-        ("BrokenWatchState: %s (%d)"):format(
-            tostring(room:GetBrokenWatchState()), room:GetSpawnSeed()
-        ),
-        85, 50,
-        0.0, 1.0, 0.0, 1.0
-    )
-    Isaac.RenderText(
-        ("level.EnterDoor: %d, start idx: %d"):format(
-            level.EnterDoor, level:GetStartingRoomIndex()
-        ),
-        85, 67,
-        0.0, 1.0, 0.0, 1.0
-    )
-    Isaac.RenderText(
-        ("IsAmbushActive? %s"):format(tostring(room:IsAmbushActive())),
-        85, 85,
-        0.0, 1.0, 0.0, 1.0
-    )
+    if _DEBUG then
+        local level = Game:GetLevel()
+        local room = Game:GetRoom()
+        Isaac.RenderText(
+            ("BrokenWatchState: %s (%d)"):format(
+                tostring(room:GetBrokenWatchState()), room:GetSpawnSeed()
+            ),
+            85, 50,
+            0.0, 1.0, 0.0, 1.0
+        )
+        Isaac.RenderText(
+            ("level.EnterDoor: %d, start idx: %d"):format(
+                level.EnterDoor, level:GetStartingRoomIndex()
+            ),
+            85, 67,
+            0.0, 1.0, 0.0, 1.0
+        )
+        Isaac.RenderText(
+            ("IsAmbushActive? %s"):format(tostring(room:IsAmbushActive())),
+            85, 85,
+            0.0, 1.0, 0.0, 1.0
+        )
+    end
 
     -- TODO: disable if in cutscene
     if self._rooms_remaining then
