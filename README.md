@@ -26,8 +26,7 @@ so there isn't a way to get the item through gameplay for now.
 * add to item pools (API doesn't facilitate this yet)
 * speed up music if active (is this possible?)
 * "animate" the required room count as it approaches zero
-* add weights to pickup spawns (rarer pickups should be, well, rarer)
-* tweak spawn numbers
+* tweak reward pickup weights
 * ? speed up player (like post-nerf SPEED! challenge)?
 * ? spawn items from specific item pools based on floor (like Pandora's Box)?
 * ? switch to costume instead of RenderText above the player's head?

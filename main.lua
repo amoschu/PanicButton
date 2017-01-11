@@ -4,23 +4,169 @@
 
 -- total number of rooms required to clear to trigger the completion reward
 local NUM_ROOMS_TO_CLEAR = 10
--- maximum number of reward pickup types to spawn
--- (randomly chosen from 0 -> the defined number below for each type)
-local MAX_REWARD = {
-    [PickupVariant.PICKUP_HEART]        = 3,
-    [PickupVariant.PICKUP_COIN]         = 3,
-    [PickupVariant.PICKUP_KEY]          = 3,
-    [PickupVariant.PICKUP_BOMB]         = 2,
+
+-- reward range (inclusive)
+local MIN_REWARDS = 5
+local MAX_REWARDS = 6
+
+-- pickup subtype weights
+-- higher numbers have a higher chance to spawn
+-- negative numbers and zero mean that the pickup type cannot spawn
+local HEART_WEIGHTS = {
+    [HeartSubType.HEART_FULL]       = 5,
+    [HeartSubType.HEART_HALF]       = 3,
+    [HeartSubType.HEART_DOUBLEPACK] = 2,
+    [HeartSubType.HEART_SOUL]       = 1,
+    [HeartSubType.HEART_ETERNAL]    = 0.5,
+    [HeartSubType.HEART_BLACK]      = 0.5,
+    [HeartSubType.HEART_GOLDEN]     = 1,
+    [HeartSubType.HEART_HALF_SOUL]  = 2,
+    [HeartSubType.HEART_SCARED]     = 0, -- what is this?
+    [HeartSubType.HEART_BLENDED]    = 1,
+}
+
+local COIN_WEIGHTS = {
+    [CoinSubType.COIN_PENNY]        = 5,
+    [CoinSubType.COIN_NICKEL]       = 2,
+    [CoinSubType.COIN_DIME]         = 1,
+    [CoinSubType.COIN_DOUBLEPACK]   = 3,
+    [CoinSubType.COIN_LUCKYPENNY]   = 1,
+    [CoinSubType.COIN_STICKYNICKEL] = 1,
+}
+
+local KEY_WEIGHTS = {
+    [KeySubType.KEY_NORMAL]     = 10,
+    [KeySubType.KEY_DOUBLEPACK] = 2,
+    [KeySubType.KEY_GOLDEN]     = 1,
+    [KeySubType.KEY_CHARGED]    = 0.5,
+}
+
+local BOMB_WEIGHTS = {
+    [BombSubType.BOMB_NORMAL]     = 5,
+    [BombSubType.BOMB_DOUBLEPACK] = 2,
+    [BombSubType.BOMB_TROLL]      = 2,
+    [BombSubType.BOMB_GOLDEN]     = 1,
+    [BombSubType.BOMB_SUPERTROLL] = 1,
+}
+
+local CHEST_WEIGHTS = {
+    [PickupVariant.PICKUP_CHEST]        = 10,
     [PickupVariant.PICKUP_BOMBCHEST]    = 2,
-    [PickupVariant.PICKUP_SPIKEDCHEST]  = 1,
-    [PickupVariant.PICKUP_ETERNALCHEST] = 1,
+    [PickupVariant.PICKUP_SPIKEDCHEST]  = 2,
+    [PickupVariant.PICKUP_ETERNALCHEST] = 0.1,
     [PickupVariant.PICKUP_LOCKEDCHEST]  = 2,
-    [PickupVariant.PICKUP_GRAB_BAG]     = 4,
-    [PickupVariant.PICKUP_PILL]         = 3,
-    [PickupVariant.PICKUP_LIL_BATTERY]  = 2,
-    [PickupVariant.PICKUP_TAROTCARD]    = 3,
-    [PickupVariant.PICKUP_TRINKET]      = 3,
-    [PickupVariant.PICKUP_REDCHEST]     = 3,
+    [PickupVariant.PICKUP_REDCHEST]     = 1,
+}
+
+local PILL_WEIGHTS = {
+	[PillColor.PILL_BLUE_BLUE]        = 1,
+	[PillColor.PILL_WHITE_BLUE]       = 1,
+	[PillColor.PILL_ORANGE_ORANGE]    = 1,
+	[PillColor.PILL_WHITE_WHITE]      = 1,
+	[PillColor.PILL_REDDOTS_RED]      = 1,
+	[PillColor.PILL_PINK_RED]         = 1,
+	[PillColor.PILL_BLUE_CADETBLUE]   = 1,
+	[PillColor.PILL_YELLOW_ORANGE]    = 1,
+	[PillColor.PILL_ORANGEDOTS_WHITE] = 1,
+	[PillColor.PILL_WHITE_AZURE]      = 1,
+	[PillColor.PILL_BLACK_YELLOW]     = 1,
+	[PillColor.PILL_WHITE_BLACK]      = 1,
+	[PillColor.PILL_WHITE_YELLOW]     = 1,
+}
+
+local CARD_WEIGHTS = {
+	[Card.CARD_FOOL]              = 5,
+	[Card.CARD_MAGICIAN]          = 5,
+	[Card.CARD_HIGH_PRIESTESS]    = 5,
+	[Card.CARD_EMPRESS]           = 5,
+	[Card.CARD_EMPEROR]           = 5,
+	[Card.CARD_HIEROPHANT]        = 5,
+	[Card.CARD_LOVERS]            = 5,
+	[Card.CARD_CHARIOT]           = 5,
+	[Card.CARD_JUSTICE]           = 5,
+	[Card.CARD_HERMIT]            = 5,
+	[Card.CARD_WHEEL_OF_FORTUNE]  = 5,
+	[Card.CARD_STRENGTH]          = 5,
+	[Card.CARD_HANGED_MAN]        = 5,
+	[Card.CARD_DEATH]             = 5,
+	[Card.CARD_TEMPERANCE]        = 5,
+	[Card.CARD_DEVIL]             = 5,
+	[Card.CARD_TOWER]             = 5,
+	[Card.CARD_STARS]             = 5,
+	[Card.CARD_MOON]              = 5,
+	[Card.CARD_SUN]               = 5,
+	[Card.CARD_JUDGEMENT]         = 5,
+	[Card.CARD_WORLD]             = 5,
+	[Card.CARD_CLUBS_2]           = 2,
+	[Card.CARD_DIAMONDS_2]        = 2,
+	[Card.CARD_SPADES_2]          = 2,
+	[Card.CARD_HEARTS_2]          = 2,
+	[Card.CARD_ACE_OF_CLUBS]      = 2,
+	[Card.CARD_ACE_OF_DIAMONDS]   = 2,
+	[Card.CARD_ACE_OF_SPADES]     = 2,
+	[Card.CARD_ACE_OF_HEARTS]     = 2,
+	[Card.CARD_JOKER]             = 2,
+	[Card.RUNE_HAGALAZ]           = 1,
+	[Card.RUNE_JERA]              = 1,
+	[Card.RUNE_EHWAZ]             = 1,
+	[Card.RUNE_DAGAZ]             = 1,
+	[Card.RUNE_ANSUZ]             = 1,
+	[Card.RUNE_PERTHRO]           = 1,
+	[Card.RUNE_BERKANO]           = 1,
+	[Card.RUNE_ALGIZ]             = 1,
+	[Card.RUNE_BLANK]             = 1,
+	[Card.RUNE_BLACK]             = 1,
+	[Card.CARD_CHAOS]             = 1,
+	[Card.CARD_CREDIT]            = 1,
+	[Card.CARD_RULES]             = 1,
+	[Card.CARD_HUMANITY]          = 1,
+	[Card.CARD_SUICIDE_KING]      = 1,
+	[Card.CARD_GET_OUT_OF_JAIL]   = 1,
+	[Card.CARD_QUESTIONMARK]      = 1,
+	[Card.CARD_DICE_SHARD]        = 1,
+	[Card.CARD_EMERGENCY_CONTACT] = 1,
+	[Card.CARD_HOLY]              = 1,
+}
+
+-- weights for each type of pickup
+local PICKUP_WEIGHTS = {
+    [PickupVariant.PICKUP_HEART] = {
+        weight = 10,
+        subtype_weights = HEART_WEIGHTS,
+    },
+    [PickupVariant.PICKUP_COIN] = {
+        weight = 5,
+        subtype_weights = COIN_WEIGHTS,
+    },
+    [PickupVariant.PICKUP_KEY] = {
+        weight = 5,
+        subtype_weights = KEY_WEIGHTS,
+    },
+    [PickupVariant.PICKUP_BOMB] = {
+        weight = 5,
+        subtype_weights = BOMB_WEIGHTS,
+    },
+    [PickupVariant.PICKUP_CHEST] = {
+        weight = 1,
+        subtype_weights = CHEST_WEIGHTS,
+    },
+    [PickupVariant.PICKUP_GRAB_BAG] = {
+        weight = 2,
+    },
+    [PickupVariant.PICKUP_PILL] = {
+        weight = 3,
+        subtype_weights = PILL_WEIGHTS,
+    },
+    [PickupVariant.PICKUP_LIL_BATTERY] = {
+        weight = 2,
+    },
+    [PickupVariant.PICKUP_TAROTCARD] = {
+        weight = 3,
+        subtype_weights = CARD_WEIGHTS,
+    },
+    [PickupVariant.PICKUP_TRINKET] = {
+        weight = 1,
+    },
 }
 
 
@@ -154,23 +300,73 @@ function mod:ResetSpeed()
     room:SetBrokenWatchState(0)
 end
 
-local variant_to_subtype = {
-    -- maps PickupVariant to *SubType enum tables
-    [PickupVariant.PICKUP_HEART]        = HeartSubType,
-    [PickupVariant.PICKUP_COIN]         = CoinSubType,
-    [PickupVariant.PICKUP_KEY]          = KeySubType,
-    [PickupVariant.PICKUP_BOMB]         = BombSubType,
-    -- [PickupVariant.PICKUP_BOMBCHEST]    = ,
-    -- [PickupVariant.PICKUP_SPIKEDCHEST]  = ,
-    -- [PickupVariant.PICKUP_ETERNALCHEST] = ,
-    -- [PickupVariant.PICKUP_LOCKEDCHEST]  = ,
-    -- [PickupVariant.PICKUP_GRAB_BAG]     = ,
-    [PickupVariant.PICKUP_PILL]         = PillColor,
-    -- [PickupVariant.PICKUP_LIL_BATTERY]  = ,
-    [PickupVariant.PICKUP_TAROTCARD]    = Card,
-    [PickupVariant.PICKUP_TRINKET]      = TrinketType,
-    -- [PickupVariant.PICKUP_REDCHEST]     = ,
-}
+-- key added to the "constant" weight tables defined at the top of the file
+local KEY_PROBABILITIES = "__probabilities"
+local function NormalizeWeights(weights)
+    if not weights[KEY_PROBABILITIES] then
+        Log("NormalizeWeights", "normalizing weights to interval [0, 1]")
+        local sum = 0
+        for k, data in pairs(weights) do
+            if type(data) == "number" then
+                sum = sum + data
+            elseif type(data) == "table" and data.weight then
+                sum = sum + data.weight
+            end
+        end
+        Log("NormalizeWeights", "\tsum: %0.2f", sum)
+
+        local probabilities = {
+            types = {},
+        }
+        local types = probabilities.types
+        -- distribute the probabilities into biased ranges
+        -- https://stackoverflow.com/a/479299
+        for k, data in pairs(weights) do
+            local v = nil
+            if type(data) == "number" then
+                v = data
+            elseif type(data) == "table" and data.weight then
+                v = data.weight
+            else
+                Log("NormalizeWeights", "\t%d: invalid weight (%s)",
+                    k, tostring(data)
+                )
+            end
+
+            if v then
+                types[#types+1] = k
+                probabilities[#probabilities+1] = v / sum
+                Log("NormalizeWeights", "\t%d: %0.2f -> %f",
+                    k, v, probabilities[#probabilities]
+                )
+            end
+        end
+
+        weights[KEY_PROBABILITIES] = probabilities
+    end
+end
+
+local function Roll(weights)
+    NormalizeWeights(weights)
+
+    local roll = math.random()
+    local sum = 0
+    Log("Roll", "%f", roll)
+    local types = weights[KEY_PROBABILITIES].types
+    for i, probability in pairs(weights[KEY_PROBABILITIES]) do
+        local type_ = types[i]
+        sum = sum + probability
+        Log("Roll", "type: %d, sum: %f (prob: %f)", type_, sum, probability)
+        if roll < sum then
+            Log("Roll", "rolled %d!", type_)
+            return type_
+        end
+    end
+    -- I'm 99% sure this can't happen
+    -- (math.random() -> [0, 1) whereas sum should always == 1.0 by the final
+    --  iteration)
+    Log("Roll", "!!!!! failed")
+end
 
 function mod:SpawnReward()
     -- Spawns the completion rewards
@@ -201,45 +397,27 @@ function mod:SpawnReward()
     PlaySound(SoundEffect.SOUND_SUPERHOLY)
 
     -- spawn pickups
-    -- XXX: this does not respect the run's seed
-    --  ie, the rewards spawned in two runs with the same seed will be different
-    --  (I don't think the API allows for this functionality yet)
+    -- XXX: does this enforce spawns to respect the run's seed?
     math.randomseed(Game:GetRoom():GetSpawnSeed())
-    for pickup_type, max in pairs(MAX_REWARD) do
-        local num_to_spawn = math.random(0, max)
-        local max_subtype = 0
-        local SubType = variant_to_subtype[pickup_type]
-        if SubType then
-            -- XXX: in order to randomly spawn a pickup subtype we need to count
-            --  the total number for each subtype enum because they are not
-            --  uniformly defined
-            -- XXX: this does not respect achievements (ie, may spawn locked
-            --  items/pickups)
-            -- TODO: weights (all subtypes have an equal chance to spawn)
-            for k, v in pairs(SubType) do
-                if (
-                    -- prune NUM_* enums from the count
-                    type(k) == "string" and k:sub(0, 4) ~= "NUM_"
-                    -- prune negative and zero subtypes
-                    and type(v) == "number" and v > 0
-                ) then
-                    max_subtype = max_subtype + 1
-                end
-            end
+    -- roll to determine the total number of pickups to spawn
+    local num_pickups = math.random(MIN_REWARDS, MAX_REWARDS)
+    for i = 1, num_pickups do
+        pickup_type = Roll(PICKUP_WEIGHTS)
+        subtype = 0
+        if PICKUP_WEIGHTS[pickup_type].subtype_weights then
+            subtype = Roll(PICKUP_WEIGHTS[pickup_type].subtype_weights)
+        end
+        -- special cases
+        if pickup_type == PickupVariant.PICKUP_CHEST then
+            -- chest "subtypes" are actually `PickupVariant`s
+            pickup_type = subtype
+            subtype = 0
         end
 
-        for i = 1, num_to_spawn do
-            local subtype = 0
-            -- roll what kind of pickup this is
-            if max_subtype > 0 then
-                subtype = math.random(max_subtype)
-            end
-
-            Log("SpawnReward", "(%d/%d) spawning type=%d, subtype=%d",
-                i, num_to_spawn, pickup_type, subtype
-            )
-            SpawnItem(pickup_type, subtype)
-        end
+        Log("SpawnReward", "(%d/%d) type: %d, subtype: %d",
+            i, num_pickups, pickup_type, subtype
+        )
+        SpawnItem(pickup_type, subtype)
     end
 
     -- spawn item pedestal(s)
@@ -447,13 +625,6 @@ function mod:OnRender()
                 tostring(room:GetBrokenWatchState()), room:GetSpawnSeed()
             ),
             85, 50,
-            0.0, 1.0, 0.0, 1.0
-        )
-        Isaac.RenderText(
-            ("level.EnterDoor: %d, start idx: %d"):format(
-                level.EnterDoor, level:GetStartingRoomIndex()
-            ),
-            85, 67,
             0.0, 1.0, 0.0, 1.0
         )
         Isaac.RenderText(
