@@ -21,7 +21,7 @@ local HEART_WEIGHTS = {
     [HeartSubType.HEART_BLACK]      = 0.5,
     [HeartSubType.HEART_GOLDEN]     = 1,
     [HeartSubType.HEART_HALF_SOUL]  = 2,
-    [HeartSubType.HEART_SCARED]     = 0, -- what is this?
+    [HeartSubType.HEART_SCARED]     = 2,
     [HeartSubType.HEART_BLENDED]    = 1,
 }
 
