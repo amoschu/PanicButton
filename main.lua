@@ -207,8 +207,8 @@ function mod:HookTickEvents()
     end
 end
 
-function mod:LoadRemaining()
-    -- Loads the required rooms remaining before triggering the reward
+function mod:Load()
+    -- Loads the previous mod's state
     local parsed = {}
     if self:HasData() then
         local data = self:LoadData()
@@ -217,11 +217,11 @@ function mod:LoadRemaining()
             parsed[#parsed+1] = datum
         end
     end
-    Log("LoadRemaining", ("%s; "):rep(#parsed), table.unpack(parsed))
+    Log("Load", ("%s; "):rep(#parsed), table.unpack(parsed))
     return table.unpack(parsed)
 end
 
-function mod:SaveRemaining()
+function mod:Dump()
     -- Saves the mod's state in case the game is closed
     if self._rooms_remaining then
         -- save the number of rooms remaining
@@ -242,14 +242,14 @@ function mod:SaveRemaining()
             end
         end
 
-        Log("SaveRemaining", "data: %s", data)
+        Log("Dump", "data: %s", data)
         self:SaveData(data)
     end
 end
 
-function mod:RemoveRemaining()
+function mod:DropData()
     -- Removes the mod's saved data
-    Log("RemoveRemaining", "removing data")
+    Log("DropData", "removing data")
     self._rooms_remaining = nil
     self._room_seed = nil
     self._num_room_enemies = nil
@@ -432,12 +432,9 @@ function mod:SpawnReward()
 
     for i = 1, num_collectibles do
         local collectible_id = nil
-        while not (
-            collectible_id and not player:HasCollectible(collectible_id)
-        ) do
+        while not collectible_id or player:HasCollectible(collectible_id) do
             -- XXX: will spawn any item so long as the player does not have it
-            --  (notably does not take seed into consideration nor does it
-            --   respect locked items)
+            --  (notably does not respect locked items)
             collectible_id = math.random(CollectibleType.NUM_COLLECTIBLES)
         end
         Log("SpawnReward", "spawning collectible=%d", collectible_id)
@@ -450,7 +447,7 @@ end
 
 function mod:OnInit(player)
     -- TODO: determine if this breaks in co-op (2nd player init)
-    local remaining, room_seed, cleared_rooms = self:LoadRemaining()
+    local remaining, room_seed, cleared_rooms = self:Load()
     if remaining then
         Log("OnInit", "remaining: %s", remaining)
         -- XXX: need to hook tick events to check if this is a new run
@@ -472,7 +469,7 @@ function mod:OnInit(player)
                 -- XXX: this breaks if the player resets a seeded run from
                 --  the starting room
                 Log("Initialize", "new game detected")
-                self:RemoveRemaining()
+                self:DropData()
             else
                 Log("Initialize", "re-initializing previous state...")
                 -- player exited & continued game
@@ -521,7 +518,7 @@ function mod:OnPanicButtonUse(collectible_id, rng)
     self._num_room_enemies = room:GetAliveEnemiesCount()
     -- immediately cache this room in case it as already cleared before use
     self:TryCacheClearedRoom()
-    self:SaveRemaining()
+    self:Dump()
     self:SpeedUp()
     self:HookTickEvents()
 
@@ -591,7 +588,7 @@ function mod:OnUpdate()
                 end
 
                 self:ResetSpeed()
-                self:RemoveRemaining()
+                self:DropData()
                 self:SpawnReward()
 
                 --[[
@@ -607,7 +604,7 @@ function mod:OnUpdate()
         end
 
         if do_save then
-            self:SaveRemaining()
+            self:Dump()
         end
     elseif self._check_is_new_run then
         -- poll whether the level is initialized
