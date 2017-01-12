@@ -1,0 +1,44 @@
+<ItemPools>
+
+    <Pool Name="treasure">
+        <Item Name="Panic Button" Weight="1" DecreaseBy="0.5" RemoveOn="0.1" />
+    </Pool>
+
+    <Pool Name="shop">
+        <Item Name="Panic Button" Weight="1" DecreaseBy="0.5" RemoveOn="0.1" />
+    </Pool>
+
+    <Pool Name="secret">
+        <Item Name="Panic Button" Weight="1" DecreaseBy="0.5" RemoveOn="0.1" />
+    </Pool>
+
+    <Pool Name="dungeon">
+        <Item Name="Panic Button" Weight="1" DecreaseBy="0.5" RemoveOn="0.1" />
+    </Pool>
+
+    <Pool Name="bossrush">
+        <Item Name="Panic Button" Weight="1" DecreaseBy="0.5" RemoveOn="0.1" />
+    </Pool>
+
+    <Pool Name="goldenChest">
+        <Item Name="Panic Button" Weight="1" DecreaseBy="0.5" RemoveOn="0.1" />
+    </Pool>
+
+    <Pool Name="greedTreasure">
+        <Item Name="Panic Button" Weight="1" DecreaseBy="0.5" RemoveOn="0.1" />
+    </Pool>
+
+    <Pool Name="greedShop">
+        <Item Name="Panic Button" Weight="1" DecreaseBy="0.5" RemoveOn="0.1" />
+    </Pool>
+
+    <Pool Name="greedSecret">
+        <Item Name="Panic Button" Weight="1" DecreaseBy="0.5" RemoveOn="0.1" />
+    </Pool>
+
+    <Pool Name="greedGoldenChest">
+        <Item Name="Panic Button" Weight="1" DecreaseBy="0.5" RemoveOn="0.1" />
+    </Pool>
+
+</ItemPools>
+
