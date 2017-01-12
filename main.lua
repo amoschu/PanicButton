@@ -414,10 +414,14 @@ function mod:SpawnReward()
             subtype = 0
         end
 
-        Log("SpawnReward", "(%d/%d) type: %d, subtype: %d",
-            i, num_pickups, pickup_type, subtype
-        )
-        SpawnItem(pickup_type, subtype)
+        if pickup_type and subtype then
+            Log("SpawnReward", "(%d/%d) type: %d, subtype: %d",
+                i, num_pickups, pickup_type, subtype
+            )
+            SpawnItem(pickup_type, subtype)
+        else
+            Log("SpawnReward", "Roll failed!")
+        end
     end
 
     -- spawn item pedestal(s)
