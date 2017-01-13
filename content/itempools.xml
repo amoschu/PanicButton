@@ -16,14 +16,23 @@
         <Item Name="Panic Button" Weight="1" DecreaseBy="0.5" RemoveOn="0.1" />
     </Pool>
 
+    <!--
+    <Pool Name="challenge">
+        <Item Name="Panic Button" Weight="0.5" DecreaseBy="0.5" RemoveOn="0.1" />
+    </Pool>
+    -->
+
+    <!--
     <Pool Name="bossrush">
         <Item Name="Panic Button" Weight="1" DecreaseBy="0.5" RemoveOn="0.1" />
     </Pool>
+    -->
 
     <Pool Name="goldenChest">
         <Item Name="Panic Button" Weight="1" DecreaseBy="0.5" RemoveOn="0.1" />
     </Pool>
 
+    <!--
     <Pool Name="greedTreasure">
         <Item Name="Panic Button" Weight="1" DecreaseBy="0.5" RemoveOn="0.1" />
     </Pool>
@@ -39,6 +48,7 @@
     <Pool Name="greedGoldenChest">
         <Item Name="Panic Button" Weight="1" DecreaseBy="0.5" RemoveOn="0.1" />
     </Pool>
+    -->
 
 </ItemPools>
 
